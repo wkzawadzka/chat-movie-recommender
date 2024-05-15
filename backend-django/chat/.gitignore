@@ -1,0 +1,3 @@
+/migrations/*
+/templates/*
+__pycache__
