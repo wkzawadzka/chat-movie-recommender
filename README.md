@@ -13,7 +13,7 @@ Next, go to [Kaggle's The Movies Dataset](https://www.kaggle.com/datasets/rounak
 
 ### (1) Set up API
 
-Go to [TheMovieDatabase](https://www.themoviedb.org/): signup, create API key and put it in `backend-djago/data/config.ini`.
+Go to [TheMovieDatabase](https://www.themoviedb.org/): signup, create API key and put it in `config.ini`. Put config.ini both in backend/data & frontend/public.
 
 ### (2) Get overviews (plots) from API
 

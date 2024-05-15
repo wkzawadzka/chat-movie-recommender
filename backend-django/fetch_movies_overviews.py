@@ -4,7 +4,7 @@ import sys
 import requests
 
 config = configparser.ConfigParser()
-config.read("./data/config.ini")
+config.read("../config.ini")
 settings = config["settings"]
 user_info = config["user_info"]
 
