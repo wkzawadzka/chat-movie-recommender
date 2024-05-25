@@ -39,9 +39,10 @@ class BERT(models.Model):
             self.tokenizer.add_special_tokens(
                 {'pad_token': 'EOS'})  # end of sentence token
             self.model.resize_token_embeddings(len(self.tokenizer))
-        self.df = movies
+        self.df = movies.dropna()
         self.overviews = [self.preprocess_string(
             str(a)) for a in self.df['overview'].values.tolist()]
+        print(f"Dataset size: {len(self.overviews)}")
 
         print("Getting bert embeddings...")
         embeddings_path = os.path.join(
@@ -82,12 +83,14 @@ class BERT(models.Model):
         @inputs
             query: string, description of movie you seek for
         @outputs
-            recommendation: list of top k movies with highest similarity score
+            result: list of top k movies with highest similarity score
         '''
         query_embedding = self.model_outputs([self.preprocess_string(query)])
         sim = cosine_similarity(query_embedding, self.overviews_embeddings)[0]
 
         movie_ids = self.df['movieID'].values.tolist()
-        top_k_indicies = sim.argsort()[-k:].tolist()
+        top_k_indicies = sim.argsort()[-k:][::-1].tolist()
 
-        return [movie_ids[i] for i in top_k_indicies]
+        result = [movie_ids[i] for i in top_k_indicies]
+        print(f"Movie IDS: {result}")
+        return result

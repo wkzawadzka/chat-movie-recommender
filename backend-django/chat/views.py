@@ -60,6 +60,8 @@ def recommend(request, query):
     result = {}
     id = 0
     for movieID in recommendationBERT:
+        # movieID = plots.loc[idx, 'movieID']
+        # print(f"idx: {idx} (= 257?), movieID: {movieID} (==260?)")
         info = plots[plots['movieID'] == movieID]
         title = info['title'].values[0]
         plot = info['overview'].values[0]
@@ -67,7 +69,7 @@ def recommend(request, query):
             movieID, credits)
 
         res = {
-            "movieID": movieID,
+            "movieID": str(movieID),
             "title": title,
             "genre": movies[movies['movieID'] == movieID]['genre'].values[0],
             "actors": actors,
