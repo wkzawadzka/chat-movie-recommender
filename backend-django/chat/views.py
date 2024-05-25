@@ -1,163 +1,80 @@
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 
-from chat.utility import *
-# from core.core import settings
-from .models import *
-from core.settings import USER_DATA
+from chat.utils import *
+from .models import BERT
+import json
+import numpy as np
+import pandas as pd
+
+# ────────────────────────────────────────────────────────────────────────
+#                            GET DATA PATHS
+# ────────────────────────────────────────────────────────────────────────
+# from core.settings import USER_DATA
 from core.settings import MOVIES_DATA
 from core.settings import MOVIE_METADATA
 from core.settings import CREDITS_DATA
-from core.settings import RATINGS_DATA
 from core.settings import PLOTS_DATA
-from core.settings import BERT_SIM_MATRIX
-import time
-import json
 
-import numpy as np
+# ────────────────────────────────────────────────────────────────────────
+#                            IMPORT DATA
+# ────────────────────────────────────────────────────────────────────────
+# users
+# users = pd.read_csv(USER_DATA, sep="::", header=None, engine="python", encoding="ISO-8859-1")
+# users.columns = ["userID", "gender", "age", "occupation", "zip-code"]
 
-from .models import Strategy
-
-
-users = load_data(USER_DATA)
-movies = load_data(MOVIES_DATA)
-credits = pd.read_csv(CREDITS_DATA)
-plots = pd.read_csv(PLOTS_DATA)
-movies_metadata = pd.read_csv(MOVIE_METADATA, low_memory=False)
+# movies
+movies = pd.read_csv(MOVIES_DATA, sep="::", header=None,
+                     engine="python", encoding="ISO-8859-1")
 movies.columns = ["movieID", "title", "genre"]
 movies["genre"] = movies["genre"].str.split("|")
-users.columns = ["userID", "gender", "age", "occupation", "zip-code"]
-ratings = load_data(RATINGS_DATA)
-ratings.columns = ["userID", "movieID", "rating", "timestamp"]
-bert_sim_matrix = np.load(BERT_SIM_MATRIX)
 
-movies, ratings = limit_movies(
-    movies, ratings, threshold=300)
-movies = movies.reset_index()
+# credits
+credits = pd.read_csv(CREDITS_DATA)
+
+# overviews
+plots = pd.read_csv(PLOTS_DATA)
+
+# meta
+movies_metadata = pd.read_csv(MOVIE_METADATA, low_memory=False)
+
+# ratings
+# ratings = pd.read_csv(RATINGS_DATA, sep="::", header=None, engine="python", encoding="ISO-8859-1")
+# ratings.columns = ["userID", "movieID", "rating", "timestamp"]
+
+# ────────────────────────────────────────────────────────────────────────
+#                            SET UP MODELS
+# ────────────────────────────────────────────────────────────────────────
+bert = BERT(plots)
+
+# ────────────────────────────────────────────────────────────────────────
+#                                  GET
+# ────────────────────────────────────────────────────────────────────────
 
 
-def get_strategy(request, movie):
-    print("time start")
-    start_time = time.time()  # Start measuring the execution time
-    # plots = load_data(PLOTS_DATA, sep=",", header=0)
-    # Retrieve all MovieLens users from the database
-    index_json = 0
-    matching_movies = movies[movies['title'] == movie]
+def recommend(request, query):
+    if request.method != "GET":
+        return JsonResponse({"0": False})
 
-    if len(matching_movies) > 0:
-        movie_id = matching_movies.iloc[0]['movieID']
+    recommendationBERT = bert.recommend(query)
+    result = {}
+    id = 0
+    for movieID in recommendationBERT:
+        info = plots[plots['movieID'] == movieID]
+        title = info['title'].values[0]
+        plot = info['overview'].values[0]
+        actors = get_actors(
+            movieID, credits)
 
-    if request.method == "GET":
+        res = {
+            "movieID": movieID,
+            "title": title,
+            "genre": movies[movies['movieID'] == movieID]['genre'].values[0],
+            "actors": actors,
+            "overview": plot,
+        }
 
-        # Get recommendations for the user
-        recommendationSVD = Strategy.recommendSVD(ratings, movies, movie_id)
-        pearson_strategy = Strategy.recommend_pearson_correlation(
-            movies, ratings, movie_id)
-        recommendationDice = Strategy.recommend_Dice_strategy(movies, movie_id)
-        recommendationTF_IDF = Strategy.recommend_TF_IDF(
-            movies, plots, movie_id)
-        recommendationBERT = Strategy.recommend_BERT(
-            movies, movie_id, bert_sim_matrix)
-        result = {}
-        for movieID in recommendationBERT[:5]:
-            movie_title = movies[movies['movieID']
-                                 == movieID]['title'].values[0]
+        result[id] = res
+        id += 1
 
-            actors, overview = get_overview_actor(
-                movieID, credits, movies_metadata)
-
-            # Create a dictionary with relevant movie details
-            new_series = {
-                "movieID": movieID,
-                "title": movie_title,
-                "genre": movies[movies['movieID'] == movieID]['genre'].values[0],
-                "actors": actors,
-                "overview": overview,
-            }
-
-            result[int(index_json)] = new_series
-            index_json += 1
-
-        for i, movieID in enumerate(recommendationDice[:5]):
-            movie_title = movies[movies['movieID']
-                                 == movieID]['title'].values[0]
-
-            actors, overview = get_overview_actor(
-                movieID, credits, movies_metadata)
-
-            # Create a dictionary with relevant movie details
-            new_series = {
-                "movieID": movieID,
-                "title": movie_title,
-                "genre": movies[movies['movieID'] == movieID]['genre'].values[0],
-                "actors": actors,
-                "overview": overview,
-            }
-
-            result[int(index_json)] = new_series
-            index_json += 1
-
-        for i, movieID in enumerate(recommendationTF_IDF[:5]):
-
-            movie_title = movies[movies['movieID']
-                                 == movieID]['title'].values[0]
-            actors, overview = get_overview_actor(
-                movieID, credits, movies_metadata)
-
-            # Create a dictionary with relevant movie details
-            new_series = {
-                "movieID": movieID,
-                "title": movie_title,
-                "genre": movies[movies['movieID'] == movieID]['genre'].values[0],
-                "actors": actors,
-                "overview": overview,
-            }
-
-            result[int(index_json)] = new_series
-            index_json += 1
-        for index, row in recommendationSVD.head(5).iterrows():
-            movieID = row['movieID']
-            movie_title = row['title']
-
-            actors, overview = get_overview_actor(
-                movieID, credits, movies_metadata)
-
-            # Create a dictionary with relevant movie details
-            new_series = {
-                "movieID": movieID,
-                "title": movie_title,
-                "genre": movies[movies['movieID'] == movieID]['genre'].values[0],
-                "actors": actors,
-                "overview": overview,
-            }
-            result[int(index_json)] = new_series
-            index_json += 1
-
-        for i, movieID in enumerate(pearson_strategy[:5]):
-
-            movie_title = movies[movies['movieID']
-                                 == movieID]['title'].values[0]
-
-            actors, overview = get_overview_actor(
-                movieID, credits, movies_metadata)
-
-            # Create a dictionary with relevant movie details
-            new_series = {
-                "movieID": movieID,
-                "title": movie_title,
-                "genre": movies[movies['movieID'] == movieID]['genre'].values[0],
-                "actors": actors,
-                "overview": overview,
-            }
-
-            result[int(index_json)] = new_series
-            index_json += 1
-
-        execution_time = time.time() - start_time
-
-        print(f"Execution time: {execution_time} seconds")
-
-        return JsonResponse({"0": result})
-
-    # If the user ID doesn't exist or the request method is not GET, return False as a JSON response
-    return JsonResponse({"0": False})
+    return JsonResponse({"0": result})

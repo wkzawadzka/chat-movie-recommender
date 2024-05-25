@@ -22,5 +22,5 @@ from chat.views import *
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("get_strategy/<str:movie>/", get_strategy, name="get_strategy"),
+    path("recommend/<str:query>/", recommend, name="recommend"),
 ]

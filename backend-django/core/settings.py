@@ -31,7 +31,7 @@ SECRET_KEY = "django-insecure-hrwz9es0y0d6x2=1n1=c!02k4eglz4khmis$7f-jr_l4(((o6a
 DEBUG = True
 
 DATA_DIR = os.path.join(BASE_DIR, "data")
-PLOTS_DATA = os.path.join(DATA_DIR, "plots.csv")
+PLOTS_DATA = os.path.join(DATA_DIR, "movies.csv")
 
 MOVIES_DATA = os.path.join(DATA_DIR, "movies.dat")
 
@@ -40,8 +40,6 @@ RATINGS_DATA = os.path.join(DATA_DIR, "ratings.dat")
 USER_DATA = os.path.join(DATA_DIR, "users.dat")
 
 MOVIE_METADATA = os.path.join(DATA_DIR, "movies_metadata.csv")
-
-BERT_SIM_MATRIX = os.path.join(DATA_DIR, "bert_sim_matrix.npy")
 
 CREDITS_DATA = os.path.join(DATA_DIR, "credits.csv")
 ALLOWED_HOSTS = []

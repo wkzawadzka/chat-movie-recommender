@@ -15,9 +15,9 @@ Next, go to [Kaggle's The Movies Dataset](https://www.kaggle.com/datasets/rounak
 
 Go to [TheMovieDatabase](https://www.themoviedb.org/): signup, create API key and put it in `config.ini`. Put config.ini both in backend/data & frontend/public.
 
-### (2) Get overviews (plots) from API
+### (2) Enrich movies data by overviews (plots) from API
 
-Run overview retrieval: `python fetch_overviews.py` in `backend-django/chat`.
+Run overview retrieval: `python fetch_overviews.py` in `backend-django/chat`. It will save movies.csv in the data folder.
 
 ### (3) Take care of CORS issues
 
@@ -28,3 +28,5 @@ https://addons.mozilla.org/en-US/firefox/addon/access-control-allow-origin/
 ### (4) Run
 
 Run `npm start` in the frontend folder and `python manage.py runserver` in backend.
+
+Takeaway: first run can take quite long, models are initializing etc.
