@@ -113,9 +113,7 @@ function App() {
       setEmpty(true);
     } else {
       setLoad(true);
-      // dummy "Toy Story (1995)" for now
-      await axios.get(`http://localhost:8000/get_strategy/Toy Story (1995)`).then((response) => {
-      // await axios.get(`http://localhost:8000/get_strategy/` + selectedMovieTitle).then((response) => {
+      await axios.get(`http://localhost:8000/recommend/` + searchQuery).then((response) => {
         if (response.data[0] !== false) {
           setMovies(response.data);
           setLoad(false);
