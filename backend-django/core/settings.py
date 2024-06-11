@@ -42,7 +42,7 @@ USER_DATA = os.path.join(DATA_DIR, "users.dat")
 MOVIE_METADATA = os.path.join(DATA_DIR, "movies_metadata.csv")
 
 CREDITS_DATA = os.path.join(DATA_DIR, "credits.csv")
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = []  # type: ignore
 
 
 # Application definition

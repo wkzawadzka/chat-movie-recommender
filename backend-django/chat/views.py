@@ -1,11 +1,12 @@
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from django.shortcuts import render
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse  # type: ignore
+from django.shortcuts import render  # type: ignore
 
 from chat.utils import *
 from .models import BERT
 import json
 import numpy as np
 import pandas as pd
+from typing import Dict, Any
 
 # ────────────────────────────────────────────────────────────────────────
 #                            GET DATA PATHS
@@ -26,7 +27,7 @@ from core.settings import PLOTS_DATA
 # movies
 movies = pd.read_csv(MOVIES_DATA, sep="::", header=None,
                      engine="python", encoding="ISO-8859-1")
-movies.columns = ["movieID", "title", "genre"]
+movies.columns = ["movieID", "title", "genre"]  # type: ignore
 movies["genre"] = movies["genre"].str.split("|")
 
 # credits
@@ -52,13 +53,13 @@ bert = BERT(plots)
 # ────────────────────────────────────────────────────────────────────────
 
 
-def recommend(request, query):
+def recommend(request: Any, query: str) -> JsonResponse:
     if request.method != "GET":
         return JsonResponse({"0": False})
 
     recommendationBERT = bert.recommend(query)
-    result = {}
-    id = 0
+    result: Dict[int, Dict[str, Any]] = {}
+    id: int = 0
     for movieID in recommendationBERT:
         # movieID = plots.loc[idx, 'movieID']
         # print(f"idx: {idx} (= 257?), movieID: {movieID} (==260?)")
@@ -68,7 +69,7 @@ def recommend(request, query):
         actors = get_actors(
             movieID, credits)
 
-        res = {
+        res: Dict[str, Any] = {
             "movieID": str(movieID),
             "title": title,
             "genre": movies[movies['movieID'] == movieID]['genre'].values[0],

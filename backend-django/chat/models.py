@@ -2,14 +2,14 @@ import os
 from tqdm import tqdm
 import torch
 from typing import List
-from nltk.corpus import stopwords
-from transformers import DistilBertTokenizer, DistilBertModel
+from nltk.corpus import stopwords  # type: ignore
+from transformers import DistilBertTokenizer, DistilBertModel  # type: ignore
 import pandas as pd
-from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.metrics.pairwise import cosine_similarity  # type: ignore
 import numpy as np
 from chat.utils import *
-from django.db import models
-import spacy
+from django.db import models  # type: ignore
+import spacy  # type: ignore
 nlp = spacy.load('en_core_web_sm')
 stop_words = set(stopwords.words('english'))
 

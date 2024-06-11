@@ -49,13 +49,14 @@ if __name__ == '__main__':
 
     # Load movies dataset
     movies = load_data("./data/movies.dat")
-    movies.columns = ['movieID', 'title', 'genre']
+    movies.columns = ['movieID', 'title', 'genre']  # type: ignore
     movies = movies.drop(['genre'], axis=1)
 
     ''' Limiting number of movies: we will drop those with less than 150 reviews
         as to not recommend too obscure ones '''
     ratings = load_data("./data/ratings.dat")
-    ratings.columns = ['userID', 'movieID', 'rating', 'timestamp']
+    ratings.columns = ['userID', 'movieID',
+                       'rating', 'timestamp']  # type: ignore
 
     # Append overview to each movie
     overviews = {title: get_movie_overview(
