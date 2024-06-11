@@ -52,8 +52,10 @@ if __name__ == '__main__':
     movies.columns = ['movieID', 'title', 'genre']  # type: ignore
     movies = movies.drop(['genre'], axis=1)
 
-    ''' Limiting number of movies: we will drop those with less than 150 reviews
-        as to not recommend too obscure ones '''
+    # Limiting number of movies:
+    # We will drop those with less than 150 reviews
+    # as to not recommend too obscure ones
+
     ratings = load_data("./data/ratings.dat")
     ratings.columns = ['userID', 'movieID',
                        'rating', 'timestamp']  # type: ignore

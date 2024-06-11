@@ -7,25 +7,25 @@ from transformers import DistilBertTokenizer, DistilBertModel  # type: ignore
 import pandas as pd
 from sklearn.metrics.pairwise import cosine_similarity  # type: ignore
 import numpy as np
-from chat.utils import *
 from django.db import models  # type: ignore
 import spacy  # type: ignore
 nlp = spacy.load('en_core_web_sm')
 stop_words = set(stopwords.words('english'))
 
-# import warnings
-# warnings.filterwarnings("ignore")
-
 
 class BERT(models.Model):
-    ''' Movie recommendation strategy based on BERT model - High-performance semantic similarity
-    Works by finding similarities between movies' overviews:
-        (1) creating tokens out of each overviews
-        (2) sending tokanized overviews though BERT model
-        (3) choice of recommendation according to cosine similarity score between model outputs
     '''
+    Movie recommendation strategy based on BERT model - High-performance semantic similarity.
+    Works by finding similarities between movies' overviews:
+        (1) creating tokens out of each overview
+        (2) sending tokenized overviews through BERT model
+        (3) choice of recommendation according to cosine similarity score between model outputs
+    '''  # noqa: E501
 
-    def __init__(self, movies: pd.DataFrame, cache_dir: str = './data/') -> None:
+    def __init__(self,
+                 movies: pd.DataFrame,
+                 cache_dir: str = './data/') -> None:
+
         # ensure cache dir exists
         self.cache_dir = cache_dir
         os.makedirs(self.cache_dir, exist_ok=True)
@@ -56,8 +56,10 @@ class BERT(models.Model):
 
     def preprocess_string(self, text: str):
         doc = nlp(text)
-        cleaned_text = ' '.join([token.lemma_ for token in doc if token.text.lower(
-        ) not in stop_words and token.is_alpha])
+        cleaned_text = ' '.join([token.lemma_
+                                 for token in doc
+                                 if token.text.lower()
+                                 not in stop_words and token.is_alpha])
 
         return cleaned_text
 
@@ -65,13 +67,17 @@ class BERT(models.Model):
         all_outputs = []
         num_batches = len(items) // batch_size + (len(items) % batch_size != 0)
 
-        for i in tqdm(range(0, len(items), batch_size), desc="Progress", total=num_batches):
+        for i in tqdm(range(0, len(items), batch_size),
+                      desc="Progress",
+                      total=num_batches):
             batch_items = items[i:i+batch_size]
             inputs = self.tokenizer(batch_items, add_special_tokens=True,
-                                    padding=True, max_length=100, truncation=True, return_tensors="pt")
+                                    padding=True, max_length=100,
+                                    truncation=True, return_tensors="pt")
 
             with torch.no_grad():
-                # [batch, maxlen, hidden_state] -> using only [batch, hidden_state]
+                # [batch, maxlen, hidden_state]
+                # -> using only [batch, hidden_state]
                 outputs = self.model(
                     **inputs).last_hidden_state[:, 0, :].numpy()
                 all_outputs.append(outputs)
@@ -79,12 +85,12 @@ class BERT(models.Model):
         return np.concatenate(all_outputs, axis=0)
 
     def recommend(self, query: str, k: int = 5):
-        '''         
+        '''
         @inputs
             query: string, description of movie you seek for
         @outputs
             result: list of top k movies with highest similarity score
-        '''
+        '''  # noqa: E501
         query_embedding = self.model_outputs([self.preprocess_string(query)])
         sim = cosine_similarity(query_embedding, self.overviews_embeddings)[0]
 

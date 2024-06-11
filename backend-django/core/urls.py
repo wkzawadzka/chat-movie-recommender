@@ -1,4 +1,4 @@
-from django.urls import include  # type: ignore
+# from django.urls import include  # type: ignore
 
 """
 URL configuration for django_blog project.
@@ -15,10 +15,10 @@ Class-based views
 Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
+"""  # noqa: E501
 from django.contrib import admin  # type: ignore
 from django.urls import path  # type: ignore
-from chat.views import *
+from chat.views import recommend
 
 urlpatterns = [
     path("admin/", admin.site.urls),

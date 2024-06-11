@@ -1,7 +1,7 @@
 import pandas as pd
 import json
 import ast
-from typing import List, Any, Dict
+from typing import List
 
 
 def get_actors(item: int, credits: pd.DataFrame) -> List[str]:

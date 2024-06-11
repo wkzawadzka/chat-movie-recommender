@@ -1,17 +1,12 @@
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse  # type: ignore
-from django.shortcuts import render  # type: ignore
-
-from chat.utils import *
+from django.http import JsonResponse  # type: ignore
+from chat.utils import get_actors
 from .models import BERT
-import json
-import numpy as np
 import pandas as pd
 from typing import Dict, Any
 
 # ────────────────────────────────────────────────────────────────────────
 #                            GET DATA PATHS
 # ────────────────────────────────────────────────────────────────────────
-# from core.settings import USER_DATA
 from core.settings import MOVIES_DATA
 from core.settings import MOVIE_METADATA
 from core.settings import CREDITS_DATA
@@ -20,10 +15,6 @@ from core.settings import PLOTS_DATA
 # ────────────────────────────────────────────────────────────────────────
 #                            IMPORT DATA
 # ────────────────────────────────────────────────────────────────────────
-# users
-# users = pd.read_csv(USER_DATA, sep="::", header=None, engine="python", encoding="ISO-8859-1")
-# users.columns = ["userID", "gender", "age", "occupation", "zip-code"]
-
 # movies
 movies = pd.read_csv(MOVIES_DATA, sep="::", header=None,
                      engine="python", encoding="ISO-8859-1")
@@ -38,10 +29,6 @@ plots = pd.read_csv(PLOTS_DATA)
 
 # meta
 movies_metadata = pd.read_csv(MOVIE_METADATA, low_memory=False)
-
-# ratings
-# ratings = pd.read_csv(RATINGS_DATA, sep="::", header=None, engine="python", encoding="ISO-8859-1")
-# ratings.columns = ["userID", "movieID", "rating", "timestamp"]
 
 # ────────────────────────────────────────────────────────────────────────
 #                            SET UP MODELS
@@ -61,8 +48,6 @@ def recommend(request: Any, query: str) -> JsonResponse:
     result: Dict[int, Dict[str, Any]] = {}
     id: int = 0
     for movieID in recommendationBERT:
-        # movieID = plots.loc[idx, 'movieID']
-        # print(f"idx: {idx} (= 257?), movieID: {movieID} (==260?)")
         info = plots[plots['movieID'] == movieID]
         title = info['title'].values[0]
         plot = info['overview'].values[0]
