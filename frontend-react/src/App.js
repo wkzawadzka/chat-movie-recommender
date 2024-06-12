@@ -219,7 +219,6 @@ function App() {
                 <strong>Actors:</strong> {selectedCard.actors.join(', ')}
               </p>
             )}
-            {/* Additional card information can be displayed here */}
           </Modal.Body>
           <Modal.Footer>
             <Button variant="secondary" onClick={handleCloseModal}>

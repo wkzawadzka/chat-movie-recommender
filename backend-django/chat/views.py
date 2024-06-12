@@ -52,9 +52,16 @@ def recommend(request: Any, query: str) -> JsonResponse:
     recommendationTFIDF = tfidf.recommend(query)
     recommendationWord2Vec = word2vec.recommend(query)
 
+    recommendations = (
+        recommendationT5 +
+        recommendationTFIDF +
+        recommendationWord2Vec +
+        recommendationBERT
+    )
+
     result: Dict[int, Dict[str, Any]] = {}
     id: int = 0
-    for movieID in recommendationT5 + recommendationTFIDF + recommendationWord2Vec + recommendationBERT:
+    for movieID in recommendations:
         info = plots[plots['movieID'] == movieID]
         title = info['title'].values[0]
         plot = info['overview'].values[0]

@@ -1,8 +1,8 @@
-from gensim.models import Word2Vec
-from nltk.tokenize import word_tokenize
-from sklearn.feature_extraction.text import TfidfVectorizer
-from nltk.stem import WordNetLemmatizer
-from transformers import T5Tokenizer, T5EncoderModel
+from gensim.models import Word2Vec  # type: ignore
+from nltk.tokenize import word_tokenize  # type: ignore
+from sklearn.feature_extraction.text import TfidfVectorizer  # type: ignore
+from nltk.stem import WordNetLemmatizer  # type: ignore
+from transformers import T5Tokenizer, T5EncoderModel  # type: ignore
 import os
 from tqdm import tqdm
 import torch
@@ -108,7 +108,9 @@ class BERT(models.Model):
 
 
 class T5Predictor(models.Model):
-    def __init__(self, movies: pd.DataFrame, cache_dir: str = './data/', model_name: str = "t5-small"):
+    def __init__(self, movies: pd.DataFrame,
+                 cache_dir: str = './data/',
+                 model_name: str = "t5-small"):
         self.cache_dir = cache_dir
         os.makedirs(self.cache_dir, exist_ok=True)
 
@@ -131,11 +133,12 @@ class T5Predictor(models.Model):
             self.overviews_embeddings = torch.load(embeddings_path)
         print("Done")
 
-    def preprocess(self, text: str) -> np.ndarray:
+    def preprocess(self, text: str) -> str:
         doc = nlp(text)
 
-        cleaned_text = ' '.join([token.lemma_ for token in doc if token.text.lower(
-        ) not in stop_words and token.is_alpha])
+        cleaned_text = ' '.join([token.lemma_ for token in doc
+                                 if token.text.lower()
+                                 not in stop_words and token.is_alpha])
 
         return cleaned_text
 
@@ -143,13 +146,17 @@ class T5Predictor(models.Model):
         all_outputs = []
         num_batches = len(items) // batch_size + (len(items) % batch_size != 0)
 
-        for i in tqdm(range(0, len(items), batch_size), desc="Progress", total=num_batches):
+        for i in tqdm(range(0, len(items), batch_size),
+                      desc="Progress",
+                      total=num_batches):
             batch_items = items[i:i+batch_size]
             inputs = self.tokenizer(batch_items, add_special_tokens=True,
-                                    padding=True, max_length=100, truncation=True, return_tensors="pt")
+                                    padding=True, max_length=100,
+                                    truncation=True, return_tensors="pt")
 
             with torch.no_grad():
-                # [batch, maxlen, hidden_state] -> using only [batch, hidden_state]
+                # [batch, maxlen, hidden_state]
+                # -> using only [batch, hidden_state]
                 outputs = self.model(
                     **inputs).last_hidden_state[:, 0, :].numpy()
                 all_outputs.append(outputs)
@@ -253,8 +260,6 @@ class Word2VecModel(models.Model):
         similarity_scores = [cosine_similarity([prompt_vector], [overview])[
             0][0] for overview in self.overviews_embeddings]
 
-        # most_similar_indices = similarity_scores.nlargest(top_n).index
-        # similarity_scores = cosine_similarity(prompt_vector, self.overviews_embeddings)[0]
         most_similar_indices = np.argsort(similarity_scores)[-top_n:][::-1]
         movie_ids = self.df['movieID'].values.tolist()
 
