@@ -1,4 +1,8 @@
-## Steps
+## About 
+
+A movie recommender based on 4 different methods: BERT, TF-IDF, T5 & Word2Vec. Let's you write a query and finds most suitable movies based on movies overviews from [TheMovieDatabase](https://www.themoviedb.org/).
+
+## How to Run
 
 ### (0) Download movie data
 
@@ -30,3 +34,13 @@ https://addons.mozilla.org/en-US/firefox/addon/access-control-allow-origin/
 Run `npm start` in the frontend folder and `python manage.py runserver` in backend.
 
 Takeaway: first run can take quite long, models are initializing etc.
+
+
+
+## Demo 
+
+
+https://github.com/wkzawadzka/chat-movie-recommender/assets/49953771/18258799-13c4-439b-856b-38e59c315794
+
+
+
