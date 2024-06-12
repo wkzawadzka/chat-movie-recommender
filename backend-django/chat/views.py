@@ -1,6 +1,6 @@
 from django.http import JsonResponse  # type: ignore
 from chat.utils import get_actors
-from .models import BERT
+from .models import BERT, T5Predictor, TFIDF, Word2VecModel
 import pandas as pd
 from typing import Dict, Any
 
@@ -34,6 +34,9 @@ movies_metadata = pd.read_csv(MOVIE_METADATA, low_memory=False)
 #                            SET UP MODELS
 # ────────────────────────────────────────────────────────────────────────
 bert = BERT(plots)
+t5 = T5Predictor(plots)
+tfidf = TFIDF(plots)
+word2vec = Word2VecModel(plots)
 
 # ────────────────────────────────────────────────────────────────────────
 #                                  GET
@@ -45,9 +48,13 @@ def recommend(request: Any, query: str) -> JsonResponse:
         return JsonResponse({"0": False})
 
     recommendationBERT = bert.recommend(query)
+    recommendationT5 = t5.recommend(query)
+    recommendationTFIDF = tfidf.recommend(query)
+    recommendationWord2Vec = word2vec.recommend(query)
+
     result: Dict[int, Dict[str, Any]] = {}
     id: int = 0
-    for movieID in recommendationBERT:
+    for movieID in recommendationT5 + recommendationTFIDF + recommendationWord2Vec + recommendationBERT:
         info = plots[plots['movieID'] == movieID]
         title = info['title'].values[0]
         plot = info['overview'].values[0]

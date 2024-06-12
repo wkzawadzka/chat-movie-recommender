@@ -157,26 +157,50 @@ function App() {
         )}
 
 {movies && Object.keys(movies).length > 0 && (
-      <div className="card-container">
-        <h2 style={{ color: 'white' }}>We recommend you</h2>
-        <div className="idex-card-container" style={{ display: 'flex', flexWrap: 'wrap' }}>
-          {splitMoviesIntoGroups(movies, 5).map((group, groupIndex) => (
-            <div key={groupIndex} style={{ display: 'flex',}}>
-              {Object.values(group).map((movie, idx) => {
-                return (
-                  <div key={idx} style={{ margin: '10px' }}>
-                    <ShowMovieDetails
-                      movie={movie}
-                      onClick={() => handleCardClick(movie)}
-                    />
-                  </div>
-                );
-              })}
+  <div className="card-container">
+    <h2 style={{ color: 'white' }}>We recommend you</h2>
+    <div className="idex-card-container" style={{ display: 'flex', flexWrap: 'wrap' }}>
+      {splitMoviesIntoGroups(movies, 5).map((group, groupIndex) => (
+        <div key={groupIndex} style={{ display: 'flex',}}>
+          {groupIndex === 3 && (
+            <div style={{ marginBottom: '10px' }}>
+              <span style={{ color: 'green' }}>Bert</span>
+            </div>
+          )}
+
+          {groupIndex === 0 && (
+            <div style={{ marginBottom: '10px' }}>
+              <span style={{ color: 'blue' }}>T5</span>
+            </div>
+          )}
+
+          {groupIndex === 1 && (
+              <div style={{ marginBottom: '10px' }}>
+                <span style={{ color: 'red' }}>TF-IDF</span>
+              </div>
+            )}
+
+          {groupIndex ===  2 && (
+              <div style={{ marginBottom: '10px' }}>
+                <span style={{ color: 'pink' }}>Word2Vec</span>
+              </div>
+            )}
+
+          {/* Render movies in the group */}
+          {Object.values(group).map((movie, idx) => (
+            <div key={idx} style={{ margin: '10px' }}>
+              <ShowMovieDetails
+                movie={movie}
+                onClick={() => handleCardClick(movie)}
+              />
+            </div>
+          ))}
         </div>
       ))}
     </div>
   </div>
 )}
+
 
         <Modal show={showModal} onHide={handleCloseModal}>
           <Modal.Header closeButton>
